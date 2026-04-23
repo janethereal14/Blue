@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Blue Project</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000814; /* Deep blue background */
+            color: #00d4ff; /* Bright blue text */
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: hidden;
+            min-height: 200vh; /* Allows scrolling */
+        }
+
+        #heart-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .content {
+            position: relative;
+            z-index: 10;
+            padding: 50px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .para {
+            margin-bottom: 300px; /* Space for scrolling */
+            font-size: 1.8rem;
+            text-align: center;
+            max-width: 800px;
+            min-height: 1.2em;
+        }
+
+        /* THE FIX FOR THE GAPS */
+        .char {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+        .char.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .char.space {
+            width: 0.35em; /* This creates the gap between words! */
+        }
+
+        /* HEART STYLING */
+        .heart {
+            position: fixed;
+            top: -10%;
+            user-select: none;
+            pointer-events: none;
+            animation: fall linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(110vh) rotate(360deg);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="heart-container"></div>
+
+    <div class="content">
+        <div class="para" data-text="Scroll down slowly! Welcome to my blue project."></div>
+        <div class="para" data-text="I hope it turns out really good as I have expected."></div>
+        <div class="para" data-text="Hi mummy! How ya doing? Isn't this fun huh?"></div>
+        <div class="para" data-text="If you like this magic of mine, please send a 💙"></div>
+    </div>
+
+    <script>
+        // 1. HEAVY HEART RAIN LOGIC
+        function createHeart() {
+            const container = document.getElementById('heart-container');
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = '💙';
+            
+            // Randomize position and look
+            heart.style.left = Math.random() * 100 + "vw";
+            heart.style.fontSize = Math.random() * 15 + 10 + "px";
+            heart.style.opacity = Math.random();
+            
+            // Randomize speed (2s to 5s)
+            const duration = Math.random() * 3 + 2;
+            heart.style.animationDuration = duration + "s";
+            
+            container.appendChild(heart);
+
+            // Cleanup
+            setTimeout(() => { heart.remove(); }, duration * 1000);
+        }
+
+        // SPAM HEARTS: Change 100 to 50 for even more hearts!
+        setInterval(createHeart, 100);
+
+        // 2. TYPEWRITER WITH GAPS LOGIC
+        const paragraphs = document.querySelectorAll('.para');
+
+        paragraphs.forEach(p => {
+            const text = p.getAttribute('data-text');
+            p.innerHTML = ''; // Clear the div
+
+            // Split into characters and wrap in spans
+            text.split('').forEach(char => {
+                const span = document.createElement('span');
+                span.classList.add('char');
+                
+                if (char === ' ') {
+                    span.classList.add('space'); // Give spaces a special class
+                }
+                
+                span.textContent = char;
+                p.appendChild(span);
+            });
+        });
+
+        // 3. SCROLL OBSERVER (Reveals text as you scroll)
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const chars = entry.target.querySelectorAll('.char');
+                    chars.forEach((char, index) => {
+                        setTimeout(() => {
+                            char.classList.add('visible');
+                        }, index * 50); // Speed of typing
+                    });
+                }
+            });
+        }, { threshold: 0.5 });
+
+        paragraphs.forEach(p => observer.observe(p));
+    </script>
+</body>
+</html>
+
+
+  
